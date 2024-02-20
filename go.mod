@@ -1,3 +1,3 @@
-module git.thooloo.net/cthulhuonice/discordchatexporter
+module github.com/cthulhuonice/discordchatexporter
 
 go 1.22.0

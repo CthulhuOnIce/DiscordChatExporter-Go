@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"git.thooloo.net/cthulhuonice/discordchatexporter/pkg/discordapi"
+	"github.com/cthulhuonice/discordchatexporter/pkg/discordapi"
 )
 
 func main() {

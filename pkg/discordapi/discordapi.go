@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"git.thooloo.net/cthulhuonice/discordchatexporter/pkg/urlbuilder"
+	"github.com/cthulhuonice/discordchatexporter/pkg/urlbuilder"
 )
 
 /*
