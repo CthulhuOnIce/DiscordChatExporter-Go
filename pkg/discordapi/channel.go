@@ -7,7 +7,7 @@ type Channel struct {
 	Guild    *Guild
 	Client   *DiscordClient
 	Position int
-	IconURL  string
+	IconURL  string   // for group DMs only
 	Parent   *Channel // for threads
 }
 
