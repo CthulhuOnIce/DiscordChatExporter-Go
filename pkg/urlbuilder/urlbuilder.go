@@ -5,8 +5,6 @@ package urlbuilder
 	Basically just a reimplementation of
 	https://github.com/Tyrrrz/DiscordChatExporter/blob/master/DiscordChatExporter.Core/Utils/UrlBuilder.cs
 
-
-
 */
 
 import (

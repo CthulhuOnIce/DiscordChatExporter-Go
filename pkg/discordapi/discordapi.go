@@ -1,7 +1,9 @@
 package discordapi
 
 import (
+	"bytes"
 	"fmt"
+	"io"
 	"net/http"
 
 	"github.com/cthulhuonice/discordchatexporter/pkg/urlbuilder"
@@ -20,7 +22,7 @@ type DiscordClient struct {
 func (d *DiscordClient) makeRequest(uri string) (*http.Response, error) {
 
 	// this just adds extra fmt.Println verbosity
-	log_mode := true
+	log_mode := false
 
 	// create a request
 	request, error := http.NewRequest(http.MethodGet, uri, nil)
@@ -43,6 +45,9 @@ func (d *DiscordClient) makeRequest(uri string) (*http.Response, error) {
 			fmt.Println("makeRequest Error!")
 		} else {
 			fmt.Println("Request to '" + uri + "' [" + response.Status + "]")
+			bodyBytes, _ := io.ReadAll(response.Body)
+			fmt.Println(string(bodyBytes))
+			response.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
 		}
 	}
 
@@ -50,7 +55,7 @@ func (d *DiscordClient) makeRequest(uri string) (*http.Response, error) {
 }
 
 func (d *DiscordClient) Ping() (*http.Response, error) {
-	u := urlbuilder.NewURLBuilder(DISCORD_API_BASE_URI+DISCORD_API_GUILDS_URI).AddArgument("limit", "1")
+	u := urlbuilder.NewURLBuilder(DISCORD_API_BASE_URI+DISCORD_API_USER_GUILDS_URI).AddArgument("limit", "1")
 	return d.makeRequest(u.BuildString())
 }
 
