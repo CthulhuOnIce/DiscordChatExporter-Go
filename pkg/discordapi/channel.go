@@ -11,6 +11,8 @@ type Channel struct {
 	Parent   *Channel // for threads
 }
 
+// https://discord.com/developers/docs/resources/channel
+
 type ChannelJSON struct { // Validate this
 	ID       string `json:"id"`
 	Name     string `json:"name"`
