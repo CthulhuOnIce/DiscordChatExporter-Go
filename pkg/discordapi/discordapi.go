@@ -15,8 +15,9 @@ This is for interacting with the discord api for archiving purposes
 */
 
 type DiscordClient struct {
-	token string
-	bot   bool
+	Token  string
+	Bot    bool
+	Guilds []*Guild
 }
 
 func (d *DiscordClient) makeRequest(uri string) (*http.Response, error) {
@@ -31,8 +32,8 @@ func (d *DiscordClient) makeRequest(uri string) (*http.Response, error) {
 	}
 
 	// fill in the token for Authorization
-	token := d.token
-	if d.bot {
+	token := d.Token
+	if d.Bot {
 		token = "Bot " + token
 	}
 	request.Header.Add("Authorization", token)
@@ -61,8 +62,8 @@ func (d *DiscordClient) Ping() (*http.Response, error) {
 
 func NewDiscordClient(token string, bot bool) *DiscordClient {
 	d := new(DiscordClient)
-	d.token = token
-	d.bot = bot
+	d.Token = token
+	d.Bot = bot
 
 	response, error := d.Ping()
 	if response.StatusCode != 200 {

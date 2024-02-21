@@ -62,6 +62,8 @@ func (d *DiscordClient) FetchGuild(guild_id int) (*Guild, error) {
 		guild.Icon_URL = ""
 	}
 
+	d.Guilds = append(d.Guilds, guild)
+
 	return guild, nil
 
 }
