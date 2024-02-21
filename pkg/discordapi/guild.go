@@ -67,3 +67,19 @@ func (d *DiscordClient) FetchGuild(guild_id int) (*Guild, error) {
 	return guild, nil
 
 }
+
+func (d *DiscordClient) EnumerateGuilds() []*Guild {
+
+	// 1. get all guilds with limit of 100
+	// 2. if guild num is < 100, immediately return with the guild list
+	// 3. if guild num is >= 100, save the snowflake of the last item and repeat until
+	// 		the snowflake is no longer different
+
+	guild_list := []*Guild{}
+	guild_list_json := []*GuildJSON{}
+
+	url = urlbuilder.NewURLBuilder(DISCORD_API_BASE_URI + DISCORD_API_USER_GUILDS_URI).AddArgument("limit", "100")
+
+	for 
+
+}

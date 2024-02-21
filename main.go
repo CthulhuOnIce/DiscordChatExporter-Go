@@ -4,20 +4,19 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/cthulhuonice/discordchatexporter/pkg/discordapi"
+	"git.thooloo.net/cthulhuonice/discordchatexporter/pkg/discordapi"
 )
 
 func help() {
 	println("Usage: discordchatexporter -t <token> [options]")
 	println("Options:")
-	println("  -g  <guild_id..>  	      Fetch a specific guild or guilds")
-	println("  -c  <channel_id..> 	      Fetch a specific channel or channels")
-	println("  -mt <num_threads=1>    	  Number of channels to fetch concurrently")
-	println("  -o <output_dir=output>     Directory for output")
-	println("  -type <type=html-dark> The type of logs to export (options: html-light, html-dark, txt, json, csv)")
-	println("  -m 				Download media files")
-	println("  -b 				Bot Mode")
-
+	println("  -g  <guild_id..>  Fetch a specific guild or guilds")
+	println("  -c  <channel_id..>  Fetch a specific channel or channels")
+	println("  -mt <num_threads=1>  Number of channels to fetch concurrently")
+	println("  -o <output_dir=output>  Directory for output")
+	println("  -type <type=html-dark>  The type of logs to export (options: html-light, html-dark, txt, json, csv)")
+	println("  -m  Download media files")
+	println("  -b  Bot Mode")
 }
 
 func main() {

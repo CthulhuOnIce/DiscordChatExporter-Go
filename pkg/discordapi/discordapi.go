@@ -56,6 +56,8 @@ func (d *DiscordClient) makeRequest(uri string) (*http.Response, error) {
 	return response, error
 }
 
+// use snowflake crawling to enumerate a large set of over 100 items
+
 func (d *DiscordClient) Ping() (*http.Response, error) {
 	u := urlbuilder.NewURLBuilder(DISCORD_API_BASE_URI+DISCORD_API_USER_GUILDS_URI).AddArgument("limit", "1")
 	return d.makeRequest(u.BuildString())
