@@ -15,9 +15,10 @@ This is for interacting with the discord api for archiving purposes
 */
 
 type DiscordClient struct {
-	Token  string
-	Bot    bool
-	Guilds []*Guild
+	Token      string
+	Bot        bool
+	Guilds     []*Guild
+	DMChannels []*Channel
 }
 
 func (d *DiscordClient) makeRequest(uri string) (*http.Response, error) {
