@@ -1,10 +1,8 @@
 package discordapi
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
-	"io"
 	"strconv"
 
 	"github.com/cthulhuonice/discordchatexporter/pkg/urlbuilder"
@@ -94,11 +92,6 @@ func (d *DiscordClient) EnumerateGuilds() []*Guild {
 	url := urlbuilder.NewURLBuilder(DISCORD_API_BASE_URI+DISCORD_API_USER_GUILDS_URI).AddArgument("limit", "100")
 
 	response, error := d.makeRequest(url.BuildString())
-
-	// print response and move cursor back to 0
-	bodyBytes, _ := io.ReadAll(response.Body)
-	fmt.Println(string(bodyBytes))
-	response.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
 
 	if error != nil {
 		fmt.Println("Failed to make request:", error)

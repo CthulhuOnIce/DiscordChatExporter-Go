@@ -91,6 +91,7 @@ func NewDiscordClient(token string, bot bool) *DiscordClient {
 	d := new(DiscordClient)
 	d.Token = token
 	d.Bot = bot
+	d.Guilds = d.EnumerateGuilds()
 
 	response, error := d.Ping()
 	if response.StatusCode != 200 {

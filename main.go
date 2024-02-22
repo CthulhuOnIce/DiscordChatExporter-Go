@@ -92,7 +92,7 @@ func main() {
 	println("Bot: ", bot_mode)
 
 	client := discordapi.NewDiscordClient(token, bot_mode)
-	println(len(client.EnumerateGuilds()))
+	println(len(client.Guilds))
 	/*
 		d := discordapi.NewDiscordClient(os.Args[1], true)
 		if len(os.Args) > 2 {
