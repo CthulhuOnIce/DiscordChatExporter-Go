@@ -32,6 +32,9 @@ func NewGuild(id int, client *DiscordClient) *Guild {
 	g := new(Guild)
 	g.ID = id
 	g.Client = client
+
+	// TODO: enumerate channels
+
 	return g
 }
 
@@ -47,6 +50,8 @@ func NewGuildFromGuildJSON(client *DiscordClient, guildJson GuildJSON) *Guild {
 	} else {
 		guild.Icon_URL = ""
 	}
+
+	fmt.Println("Discovered Guild:", guild.Name, "["+fmt.Sprint(guild.ID)+"]")
 
 	return guild
 }
@@ -107,6 +112,41 @@ func (d *DiscordClient) EnumerateGuilds() []*Guild {
 
 	for i := range responseData {
 		guild_list = append(guild_list, NewGuildFromGuildJSON(d, responseData[i]))
+	}
+
+	// TODO: recursively crawl if there are more than 100 guilds
+
+	// get ID of last guild
+	last_guild_id := guild_list[len(guild_list)-1].ID
+
+	if len(responseData) >= 100 {
+
+		for {
+			url := urlbuilder.NewURLBuilder(DISCORD_API_BASE_URI+DISCORD_API_USER_GUILDS_URI).AddArgument("limit", "100").AddArgument("before", fmt.Sprint(last_guild_id))
+			response, error = d.makeRequest(url.BuildString())
+
+			if error != nil {
+				fmt.Println("Failed to make request:", error)
+				return guild_list
+			}
+
+			error = json.NewDecoder(response.Body).Decode(&responseData)
+
+			if error != nil {
+				fmt.Println("Failed to decode guild json:", error)
+				return guild_list
+			}
+
+			if len(responseData) == 0 { // we are done
+				break
+			}
+
+			for i := range responseData {
+				guild_list = append(guild_list, NewGuildFromGuildJSON(d, responseData[i]))
+			}
+
+			last_guild_id = guild_list[len(guild_list)-1].ID
+		}
 	}
 
 	return guild_list
