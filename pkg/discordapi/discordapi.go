@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"time"
 
 	"github.com/cthulhuonice/discordchatexporter/pkg/urlbuilder"
 )
@@ -21,6 +22,7 @@ type DiscordClient struct {
 	DMChannels []*Channel
 }
 
+// TOOD: handle rate limiting
 func (d *DiscordClient) makeRequest(uri string) (*http.Response, error) {
 
 	// this just adds extra fmt.Println verbosity
@@ -75,5 +77,9 @@ func NewDiscordClient(token string, bot bool) *DiscordClient {
 	if error != nil {
 		fmt.Println("Error! ", error)
 	}
+
+	// TODO: better way of managing timeouts
+	time.Sleep(1 * time.Second)
+
 	return d
 }

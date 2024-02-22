@@ -1,8 +1,10 @@
 package discordapi
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"strconv"
 
 	"github.com/cthulhuonice/discordchatexporter/pkg/urlbuilder"
@@ -86,20 +88,32 @@ func (d *DiscordClient) EnumerateGuilds() []*Guild {
 	// 		the snowflake is no longer different
 
 	guild_list := []*Guild{}
-	guild_list_json := []GuildJSON{}
+
+	responseData := []GuildJSON{}
 
 	url := urlbuilder.NewURLBuilder(DISCORD_API_BASE_URI+DISCORD_API_USER_GUILDS_URI).AddArgument("limit", "100")
 
 	response, error := d.makeRequest(url.BuildString())
 
-	error = json.NewDecoder(response.Body).Decode(&guild_list_json)
+	// print response and move cursor back to 0
+	bodyBytes, _ := io.ReadAll(response.Body)
+	fmt.Println(string(bodyBytes))
+	response.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
 
 	if error != nil {
-		panic(error)
+		fmt.Println("Failed to make request:", error)
+		return guild_list
 	}
 
-	for i := range guild_list_json {
-		guild_list = append(guild_list, NewGuildFromGuildJSON(d, guild_list_json[i]))
+	error = json.NewDecoder(response.Body).Decode(&responseData)
+
+	if error != nil {
+		fmt.Println("Failed to decode guild json:", error)
+		return guild_list
+	}
+
+	for i := range responseData {
+		guild_list = append(guild_list, NewGuildFromGuildJSON(d, responseData[i]))
 	}
 
 	return guild_list
