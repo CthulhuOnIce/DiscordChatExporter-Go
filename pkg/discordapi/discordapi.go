@@ -2,6 +2,7 @@ package discordapi
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -22,7 +23,11 @@ type DiscordClient struct {
 	DMChannels []*Channel
 }
 
-// TOOD: handle rate limiting
+type RateLimit struct {
+	Message    string  `json:"message"`
+	RetryAfter float32 `json:"retry_after"`
+}
+
 func (d *DiscordClient) makeRequest(uri string) (*http.Response, error) {
 
 	// this just adds extra fmt.Println verbosity
@@ -55,6 +60,23 @@ func (d *DiscordClient) makeRequest(uri string) (*http.Response, error) {
 		}
 	}
 
+	// check if we are being rate-limited
+	bodyBytes, _ := io.ReadAll(response.Body)
+	response.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
+
+	rateLimit := RateLimit{}
+	json.NewDecoder(bytes.NewBuffer(bodyBytes)).Decode(&rateLimit)
+	if rateLimit.RetryAfter != 0.0 {
+		retryAfter := rateLimit.RetryAfter
+		fmt.Println("Rate limited! Retrying after", retryAfter, "seconds")
+		duration := int(retryAfter * 1000)
+		time.Sleep(time.Duration(duration) * time.Millisecond)
+		return d.makeRequest(uri)
+	}
+
+	// move the response body back to the beginning
+	response.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
+
 	return response, error
 }
 
@@ -77,9 +99,6 @@ func NewDiscordClient(token string, bot bool) *DiscordClient {
 	if error != nil {
 		fmt.Println("Error! ", error)
 	}
-
-	// TODO: better way of managing timeouts
-	time.Sleep(1 * time.Second)
 
 	return d
 }
