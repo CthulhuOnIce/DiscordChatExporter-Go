@@ -62,30 +62,39 @@ func NewGuildFromGuildJSON(client *DiscordClient, guildJson GuildJSON) *Guild {
 }
 
 func (d *DiscordClient) FetchGuild(guild_id int) (*Guild, error) {
-	u := urlbuilder.NewURLBuilder(DISCORD_API_BASE_URI + DISCORD_API_FETCH_GUILD_URI + "/" + fmt.Sprint(guild_id))
-	response, error := d.makeRequest(u.BuildString())
-	if error != nil {
-		return nil, error
+	u := urlbuilder.NewURLBuilder(DISCORD_API_BASE_URI + DISCORD_API_FETCH_GUILD_URI + "/" + strconv.Itoa(guild_id))
+	response, err := d.makeRequest(u.BuildString())
+	if err != nil {
+		return nil, err
 	}
+	defer response.Body.Close()
 
 	if response.StatusCode != 200 {
 		return nil, fmt.Errorf("failed to fetch guild")
 	}
 
 	// decode the json
-	guildJson := GuildJSON{}
-	error = json.NewDecoder(response.Body).Decode(&guildJson)
-	if error != nil {
-		fmt.Println("Failed to decode guild json")
-		panic(error)
+	var guildJson GuildJSON
+	if err = json.NewDecoder(response.Body).Decode(&guildJson); err != nil {
+		return nil, fmt.Errorf("failed to decode guild json: %v", err)
+	}
+
+	// Check if guild already exists
+	guildJsonID, err := strconv.Atoi(guildJson.ID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to convert guildJson.ID to int: %v", err)
+	}
+
+	for _, guild := range d.Guilds {
+		if guild.ID == guildJsonID {
+			return guild, nil
+		}
 	}
 
 	guild := NewGuildFromGuildJSON(d, guildJson)
-
 	d.Guilds = append(d.Guilds, guild)
 
 	return guild, nil
-
 }
 
 func (d *DiscordClient) EnumerateGuilds() []*Guild {
