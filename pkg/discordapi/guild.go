@@ -96,64 +96,38 @@ func (d *DiscordClient) EnumerateGuilds() []*Guild {
 	// 		the snowflake is no longer different
 
 	guild_list := []*Guild{}
-
 	responseData := []GuildJSON{}
+	last_guild_id := ""
 
-	url := urlbuilder.NewURLBuilder(DISCORD_API_BASE_URI+DISCORD_API_USER_GUILDS_URI).AddArgument("limit", "100")
-
-	response, error := d.makeRequest(url.BuildString())
-
-	if error != nil {
-		fmt.Println("Failed to make request:", error)
-		return guild_list
-	}
-
-	error = json.NewDecoder(response.Body).Decode(&responseData)
-
-	if error != nil {
-		fmt.Println("Failed to decode guild json:", error)
-		return guild_list
-	}
-
-	for i := range responseData {
-		guild_list = append(guild_list, NewGuildFromGuildJSON(d, responseData[i]))
-	}
-
-	// TODO: recursively crawl if there are more than 100 guilds
-
-	// get ID of last guild
-	last_guild_id := guild_list[len(guild_list)-1].ID
-
-	if len(responseData) >= 100 {
-
-		for {
-			url := urlbuilder.NewURLBuilder(DISCORD_API_BASE_URI+DISCORD_API_USER_GUILDS_URI).AddArgument("limit", "100").AddArgument("before", fmt.Sprint(last_guild_id))
-			response, error = d.makeRequest(url.BuildString())
-
-			if error != nil {
-				fmt.Println("Failed to make request:", error)
-				return guild_list
-			}
-
-			error = json.NewDecoder(response.Body).Decode(&responseData)
-
-			if error != nil {
-				fmt.Println("Failed to decode guild json:", error)
-				return guild_list
-			}
-
-			if len(responseData) == 0 { // we are done
-				break
-			}
-
-			for i := range responseData {
-				guild_list = append(guild_list, NewGuildFromGuildJSON(d, responseData[i]))
-			}
-
-			last_guild_id = guild_list[len(guild_list)-1].ID
+	// loop until we have all the guilds, signified by a response of less than 100
+	for {
+		url := urlbuilder.NewURLBuilder(DISCORD_API_BASE_URI+DISCORD_API_USER_GUILDS_URI).AddArgument("limit", "100")
+		if last_guild_id != "" {
+			url.AddArgument("before", last_guild_id)
 		}
+
+		response, error := d.makeRequest(url.BuildString())
+		if error != nil {
+			fmt.Println("Failed to make request:", error)
+			return guild_list
+		}
+
+		error = json.NewDecoder(response.Body).Decode(&responseData)
+		if error != nil {
+			fmt.Println("Failed to decode guild json:", error)
+			return guild_list
+		}
+
+		for i := range responseData {
+			guild_list = append(guild_list, NewGuildFromGuildJSON(d, responseData[i]))
+		}
+
+		if len(responseData) < 100 {
+			break
+		}
+
+		last_guild_id = fmt.Sprint(guild_list[len(guild_list)-1].ID)
 	}
 
 	return guild_list
-
 }
