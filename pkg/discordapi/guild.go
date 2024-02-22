@@ -3,6 +3,7 @@ package discordapi
 import (
 	"encoding/json"
 	"fmt"
+	"os"
 	"strconv"
 
 	"github.com/cthulhuonice/discordchatexporter/pkg/urlbuilder"
@@ -40,6 +41,8 @@ func NewGuild(id int, client *DiscordClient) *Guild {
 
 func NewGuildFromGuildJSON(client *DiscordClient, guildJson GuildJSON) *Guild {
 
+	logMode := os.Getenv(ENV_ENABLE_GUILD_LOG) == "1"
+
 	guild_id, _ := strconv.Atoi(guildJson.ID)
 
 	guild := NewGuild(guild_id, client)
@@ -51,7 +54,9 @@ func NewGuildFromGuildJSON(client *DiscordClient, guildJson GuildJSON) *Guild {
 		guild.Icon_URL = ""
 	}
 
-	fmt.Println("Discovered Guild:", guild.Name, "["+fmt.Sprint(guild.ID)+"]")
+	if logMode {
+		fmt.Println("Creating Guild from JSON:", guild.Name, "["+fmt.Sprint(guild.ID)+"]")
+	}
 
 	return guild
 }

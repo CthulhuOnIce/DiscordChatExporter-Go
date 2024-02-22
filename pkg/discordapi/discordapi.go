@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/cthulhuonice/discordchatexporter/pkg/urlbuilder"
@@ -30,7 +31,7 @@ type RateLimit struct {
 
 func (d *DiscordClient) makeRequest(uri string) (*http.Response, error) {
 	// this just adds extra fmt.Println verbosity
-	logMode := true
+	logMode := os.Getenv(ENV_ENABLE_REQUEST_LOG) == "1"
 
 	// create a request
 	request, err := http.NewRequest(http.MethodGet, uri, nil)
@@ -100,6 +101,7 @@ func (d *DiscordClient) Ping() (*http.Response, error) {
 
 func NewDiscordClient(token string, bot bool) *DiscordClient {
 	d := new(DiscordClient)
+
 	d.Token = token
 	d.Bot = bot
 	response, error := d.Ping()
