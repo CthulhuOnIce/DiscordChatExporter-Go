@@ -92,6 +92,9 @@ func (d *DiscordClient) FetchGuild(guild_id int) (*Guild, error) {
 	}
 
 	guild := NewGuildFromGuildJSON(d, guildJson)
+
+	// guild.Channels = guild.EnumerateChannels()
+
 	d.Guilds = append(d.Guilds, guild)
 
 	return guild, nil
@@ -128,7 +131,13 @@ func (d *DiscordClient) EnumerateGuilds() []*Guild {
 		}
 
 		for i := range responseData {
-			guild_list = append(guild_list, NewGuildFromGuildJSON(d, responseData[i]))
+			id, _ := strconv.Atoi(responseData[i].ID)
+			guild, err := d.FetchGuild(id)
+			if err != nil {
+				fmt.Println("Failed to fetch guild:", err)
+				return guild_list
+			}
+			guild_list = append(guild_list, guild)
 		}
 
 		if len(responseData) < 100 {
