@@ -3,6 +3,7 @@ package discordapi
 import (
 	"encoding/json"
 	"fmt"
+	"strconv"
 
 	"github.com/cthulhuonice/discordchatexporter/pkg/urlbuilder"
 )
@@ -34,6 +35,22 @@ func NewGuild(id int, client *DiscordClient) *Guild {
 	return g
 }
 
+func NewGuildFromGuildJSON(client *DiscordClient, guildJson GuildJSON) *Guild {
+
+	guild_id, _ := strconv.Atoi(guildJson.ID)
+
+	guild := NewGuild(guild_id, client)
+	guild.Name = guildJson.Name
+
+	if guildJson.Icon != "" {
+		guild.Icon_URL = "https://cdn.discordapp.com/icons/" + fmt.Sprint(guild_id) + "/" + guildJson.Icon + ".png"
+	} else {
+		guild.Icon_URL = ""
+	}
+
+	return guild
+}
+
 func (d *DiscordClient) FetchGuild(guild_id int) (*Guild, error) {
 	u := urlbuilder.NewURLBuilder(DISCORD_API_BASE_URI + DISCORD_API_FETCH_GUILD_URI + "/" + fmt.Sprint(guild_id))
 	response, error := d.makeRequest(u.BuildString())
@@ -53,14 +70,7 @@ func (d *DiscordClient) FetchGuild(guild_id int) (*Guild, error) {
 		panic(error)
 	}
 
-	guild := NewGuild(guild_id, d)
-	guild.Name = guildJson.Name
-
-	if guildJson.Icon != "" {
-		guild.Icon_URL = "https://cdn.discordapp.com/icons/" + fmt.Sprint(guild_id) + "/" + guildJson.Icon + ".png"
-	} else {
-		guild.Icon_URL = ""
-	}
+	guild := NewGuildFromGuildJSON(d, guildJson)
 
 	d.Guilds = append(d.Guilds, guild)
 
@@ -76,10 +86,22 @@ func (d *DiscordClient) EnumerateGuilds() []*Guild {
 	// 		the snowflake is no longer different
 
 	guild_list := []*Guild{}
-	guild_list_json := []*GuildJSON{}
+	guild_list_json := []GuildJSON{}
 
-	url = urlbuilder.NewURLBuilder(DISCORD_API_BASE_URI + DISCORD_API_USER_GUILDS_URI).AddArgument("limit", "100")
+	url := urlbuilder.NewURLBuilder(DISCORD_API_BASE_URI+DISCORD_API_USER_GUILDS_URI).AddArgument("limit", "100")
 
-	for 
+	response, error := d.makeRequest(url.BuildString())
+
+	error = json.NewDecoder(response.Body).Decode(&guild_list_json)
+
+	if error != nil {
+		panic(error)
+	}
+
+	for i := range guild_list_json {
+		guild_list = append(guild_list, NewGuildFromGuildJSON(d, guild_list_json[i]))
+	}
+
+	return guild_list
 
 }

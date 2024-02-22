@@ -4,7 +4,7 @@ import (
 	"os"
 	"strconv"
 
-	"git.thooloo.net/cthulhuonice/discordchatexporter/pkg/discordapi"
+	"github.com/cthulhuonice/discordchatexporter/pkg/discordapi"
 )
 
 func help() {
@@ -39,6 +39,8 @@ func main() {
 		if value == "-t" {
 			token = os.Args[arg+1]
 			arg++
+		} else if value == "-b" {
+			bot_mode = !bot_mode
 		} else if value == "-mt" {
 			num_threads, _ = strconv.Atoi(os.Args[arg+1])
 			arg++
@@ -81,7 +83,7 @@ func main() {
 	for target := range channel_targets {
 		println(" - ", channel_targets[target])
 	}
-	println("Channel Targets: ", len(guild_targets))
+	println("Guild Targets: ", len(guild_targets))
 	for target := range guild_targets {
 		println(" - ", guild_targets[target])
 	}
@@ -90,7 +92,7 @@ func main() {
 	println("Bot: ", bot_mode)
 
 	client := discordapi.NewDiscordClient(token, bot_mode)
-
+	println(len(client.EnumerateGuilds()))
 	/*
 		d := discordapi.NewDiscordClient(os.Args[1], true)
 		if len(os.Args) > 2 {
