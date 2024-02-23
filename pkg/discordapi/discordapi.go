@@ -24,6 +24,7 @@ type DiscordClient struct {
 	DMChannels []*Channel
 }
 
+// the response gets unmarshalled here first, to check for rate limiting
 type RateLimit struct {
 	Message    string  `json:"message"`
 	RetryAfter float32 `json:"retry_after"`

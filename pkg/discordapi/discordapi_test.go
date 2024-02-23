@@ -1,7 +1,7 @@
 package discordapi
 
 import (
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -38,7 +38,7 @@ func TestMakeRequest(t *testing.T) {
 	}
 
 	// Read the response body
-	body, err := ioutil.ReadAll(response.Body)
+	body, err := io.ReadAll(response.Body)
 	if err != nil {
 		t.Errorf("Unexpected error reading response body: %v", err)
 	}
