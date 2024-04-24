@@ -94,7 +94,7 @@ if not args.nobuild:
         print(colors.RED + "Build Failed" + colors.ENDC)
         exit(3)
     else:
-        print(colors.GREEN + "Build Successful" + colors.ENDC)
+        print(colors.GREEN + f"Build Successful: {output}" + colors.ENDC)
 else:
     print(colors.WARNING + "Skipping build" + colors.ENDC)
 
