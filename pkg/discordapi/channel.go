@@ -8,8 +8,28 @@ type Channel struct {
 	Guild    *Guild
 	Client   *DiscordClient
 	Position int
-	IconURL  string   // for group DMs only
-	Parent   *Channel // for threads
+}
+
+type ThreadChannel struct {
+	Channel          // embeds Channel
+	Parent  *Channel // the parent channel, for threads
+}
+
+type GroupDM struct {
+	Channel        // embeds Channel
+	IconURL string // for group DMs only
+}
+
+type VoiceChannel struct {
+	Channel // embeds Channel
+}
+
+type GuildTextChannel struct {
+	Channel // embeds Channel
+}
+
+type DMChannel struct {
+	Channel // embeds Channel
 }
 
 // channel types https://discord.com/developers/docs/resources/channel#channel-object-channel-types

@@ -20,8 +20,8 @@ This is for interacting with the discord api for archiving purposes
 type DiscordClient struct {
 	Token      string
 	Bot        bool
-	Guilds     []*Guild
-	DMChannels []*Channel
+	Guilds     map[int]*Guild
+	DMChannels map[int]*Channel
 }
 
 type RateLimit struct {
@@ -113,7 +113,7 @@ func NewDiscordClient(token string, bot bool) *DiscordClient {
 		fmt.Println("Error! ", error)
 	}
 
-	d.Guilds = d.EnumerateGuilds()
+	d.EnumerateGuilds()
 
 	return d
 }
