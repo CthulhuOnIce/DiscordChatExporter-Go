@@ -171,33 +171,44 @@ func TestEnumerateGuilds(t *testing.T) {
 	DISCORD_API_BASE_URI = mockServer.URL + "/"
 
 	client := &DiscordClient{} // Initialize the client variable
+	client.Guilds = make(map[int]*Guild)
 
 	// Call the function being tested
-	guilds := client.EnumerateGuilds()
+	client.EnumerateGuilds()
 
 	// Assert the expected number of guilds
-	if len(guilds) != 2 {
-		t.Errorf("Expected 2 guilds, but got %d", len(guilds))
+	if len(client.Guilds) != 2 {
+		t.Errorf("Expected 2 guilds, but got %d", len(client.Guilds))
 	}
 
 	// Assert the expected guild values
-	if guilds[0].ID != 123 {
-		t.Errorf("Expected guild ID to be 123, but got %d", guilds[0].ID)
+	firstGuild, ok := client.Guilds[123]
+	if !ok {
+		t.Errorf("Expected guild with ID 123 to exist, but it does not")
 	}
-	if guilds[0].Name != "TestGuild1" {
-		t.Errorf("Expected guild name to be 'TestGuild1', but got '%s'", guilds[0].Name)
+	if firstGuild.ID != 123 {
+		t.Errorf("Expected guild ID to be 123, but got %d", client.Guilds[0].ID)
 	}
-	if guilds[0].Icon_URL != "https://cdn.discordapp.com/icons/123/test_icon1.png" {
-		t.Errorf("Expected guild icon URL to be 'https://cdn.discordapp.com/icons/123/test_icon1.png', but got '%s'", guilds[0].Icon_URL)
+	if firstGuild.Name != "TestGuild1" {
+		t.Errorf("Expected guild name to be 'TestGuild1', but got '%s'", client.Guilds[0].Name)
+	}
+	if firstGuild.Icon_URL != "https://cdn.discordapp.com/icons/123/test_icon1.png" {
+		t.Errorf("Expected guild icon URL to be 'https://cdn.discordapp.com/icons/123/test_icon1.png', but got '%s'", client.Guilds[0].Icon_URL)
 	}
 
-	if guilds[1].ID != 456 {
-		t.Errorf("Expected guild ID to be 456, but got %d", guilds[1].ID)
+	secondGuild, ok := client.Guilds[456]
+
+	if !ok {
+		t.Errorf("Expected guild with ID 456 to exist, but it does not")
 	}
-	if guilds[1].Name != "TestGuild2" {
-		t.Errorf("Expected guild name to be 'TestGuild2', but got '%s'", guilds[1].Name)
+
+	if secondGuild.ID != 456 {
+		t.Errorf("Expected guild ID to be 456, but got %d", client.Guilds[1].ID)
 	}
-	if guilds[1].Icon_URL != "https://cdn.discordapp.com/icons/456/test_icon2.png" {
-		t.Errorf("Expected guild icon URL to be 'https://cdn.discordapp.com/icons/456/test_icon2.png', but got '%s'", guilds[1].Icon_URL)
+	if secondGuild.Name != "TestGuild2" {
+		t.Errorf("Expected guild name to be 'TestGuild2', but got '%s'", client.Guilds[1].Name)
+	}
+	if secondGuild.Icon_URL != "https://cdn.discordapp.com/icons/456/test_icon2.png" {
+		t.Errorf("Expected guild icon URL to be 'https://cdn.discordapp.com/icons/456/test_icon2.png', but got '%s'", client.Guilds[1].Icon_URL)
 	}
 }

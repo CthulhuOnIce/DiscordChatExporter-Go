@@ -96,7 +96,60 @@ func (d *DiscordClient) FetchGuild(guild_id int) (*Guild, error) {
 	return guild, nil
 }
 
+/*
+func (d *DiscordClient) EnumerateGuilds() []*Guild {
+
+	// 1. get all guilds with limit of 100
+	// 2. if guild num is < 100, immediately return with the guild list
+	// 3. if guild num is >= 100, save the snowflake of the last item and repeat until
+	// 		the snowflake is no longer different
+
+	guild_list := []*Guild{}
+	responseData := []GuildJSON{}
+	last_guild_id := ""
+
+	// loop until we have all the guilds, signified by a response of less than 100
+	for {
+		url := urlbuilder.NewURLBuilder(DISCORD_API_BASE_URI+DISCORD_API_USER_GUILDS_URI).AddArgument("limit", "100")
+		if last_guild_id != "" {
+			url.AddArgument("before", last_guild_id)
+		}
+
+		response, error := d.makeRequest(url.BuildString())
+		if error != nil {
+			fmt.Println("Failed to make request:", error)
+			return guild_list
+		}
+
+		error = json.NewDecoder(response.Body).Decode(&responseData)
+		if error != nil {
+			fmt.Println("Failed to decode guild json:", error)
+			return guild_list
+		}
+
+		for i := range responseData {
+			id, _ := strconv.Atoi(responseData[i].ID)
+			guild, err := d.FetchGuild(id)
+			if err != nil {
+				fmt.Println("Failed to fetch guild:", err)
+				return guild_list
+			}
+			guild_list = append(guild_list, guild)
+		}
+
+		if len(responseData) < 100 {
+			break
+		}
+
+		last_guild_id = fmt.Sprint(guild_list[len(guild_list)-1].ID)
+	}
+
+	return guild_list
+}
+*/
+
 func (d *DiscordClient) EnumerateGuilds() {
+
 	// 1. get all guilds with limit of 100
 	//    1a. Used cached guild if in d.Guilds (map[int]*Guild)
 	// 2. if guild num is < 100, immediately return with the guild list
@@ -124,14 +177,24 @@ func (d *DiscordClient) EnumerateGuilds() {
 			return
 		}
 
+		var guild *Guild
+
 		for i := range responseData {
 			id, _ := strconv.Atoi(responseData[i].ID)
 			if _, ok := d.Guilds[id]; !ok {
-				guild := NewGuildFromGuildJSON(d, responseData[i])
+				guild = NewGuildFromGuildJSON(d, responseData[i])
 				d.Guilds[id] = guild
+			} else {
+				guild = d.Guilds[id]
 			}
 
 		}
+
+		if len(responseData) < 100 {
+			break
+		}
+
+		lastGuildID = fmt.Sprint(guild.ID)
 
 	}
 

@@ -104,6 +104,7 @@ func NewDiscordClient(token string, bot bool) *DiscordClient {
 
 	d.Token = token
 	d.Bot = bot
+	d.Guilds = make(map[int]*Guild)
 	response, error := d.Ping()
 
 	if response.StatusCode != 200 {
